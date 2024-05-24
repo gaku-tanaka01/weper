@@ -27,14 +27,19 @@ jobs:
     - name: Sync file to destination repository
       run: |
         # Create a new directory for the target repository
+        mkdir target-repo
+        cd target-repo
 
         # Initialize a new Git repository
         git init
 
-        # Add the specific file from the source repository
-        git add ../target/debug/weper_cli
-        git add ../target/debug/weper_cli.exe
-        git add ../README.md
+        # Copy the specific file from the source repository
+        cp ../target/debug/weper_cli ./weper_cli
+        git add weper_cli
+        cp ../target/debug/weper_cli.exe ./weper_cli.exe
+        git add weper_cli.exe
+        cp ../README.md ./README.md
+        git add README.md
 
         # Commit the file
         git commit -m "Sync weper_cli from source repository"
