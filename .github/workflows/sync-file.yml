@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - target/debug/weper_cli  ## 監視ファイル
-      - target/debug/weper_cli.exe ## 監視ファイル
+      - target/x86_64-pc-windows-gnu/weper_cli.exe ## 監視ファイル
       - README.md ## 監視ファイル
 
 jobs:
@@ -46,7 +46,7 @@ jobs:
         # Copy the specific file from the source repository
         cp ../target/debug/weper_cli ./weper_cli
         git add weper_cli
-        cp ../target/debug/weper_cli.exe ./weper_cli.exe
+        cp ../target/x86_64-pc-windows-gnu/weper_cli.exe ./weper_cli.exe
         git add weper_cli.exe
         cp ../README.md ./README.md
         git add README.md

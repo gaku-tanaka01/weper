@@ -6,5 +6,6 @@
 
 # .target/debug/weper_cli と .target/debug/weper_cli.exe を除外して追跡
 !/target/debug/
+!target/x86_64-pc-windows-gnu/
+!target/x86_64-pc-windows-gnu/weper_cli.exe
 !/target/debug/weper_cli
-!/target/debug/weper_cli.exe
