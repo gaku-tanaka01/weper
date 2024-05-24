@@ -32,9 +32,16 @@ jobs:
 
         # Initialize a new Git repository
         git init
+        echo "---------------------------------------------------------"
         ls -a
+        echo "---------------------------------------------------------"
         ls ../ -la
+        echo "---------------------------------------------------------"
         ls ./
+        echo "t---------------------------------------------------------"
+        ls target/debug/
+        echo "---------------------------------------------------------"
+        
 
         # Copy the specific file from the source repository
         cp ../target/debug/weper_cli ./weper_cli
