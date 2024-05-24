@@ -32,6 +32,9 @@ jobs:
 
         # Initialize a new Git repository
         git init
+        ls -a
+        ls ../ -la
+        ls ./
 
         # Copy the specific file from the source repository
         cp ../target/debug/weper_cli ./weper_cli
