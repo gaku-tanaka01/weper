@@ -14,53 +14,52 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout source repository
-      uses: actions/checkout@v2
-      with:
-        token: ${{ secrets.ORG_ACCESS_TOKEN }}
+      - name: Checkout source repository
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.ORG_ACCESS_TOKEN }}
 
-    - name: Set up Git
-      run: |
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+      - name: Set up Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
 
-    - name: Sync file to destination repository
-      run: |
-        # Create a new directory for the target repository
-        mkdir target-repo
-        cd target-repo
+      - name: Sync file to destination repository
+        run: |
+          # Create a new directory for the target repository
+          mkdir target-repo
+          cd target-repo
 
-        # Initialize a new Git repository
-        git init
-        echo "---------------------------------------------------------"
+          # Initialize a new Git repository
+          git init
+          echo "---------------------------------------------------------"
 
-        # Create and switch to 'main' branch if it does not exist
-        git checkout -b main
-        echo "---------------------------------------------------------"
-        ls -a
-        echo "---------------------------------------------------------"
-        ls ../ -la
-        echo "---------------------------------------------------------"
-        ls ./
-        echo "t---------------------------------------------------------"
-        ls ../target/debug/
-        echo "---------------------------------------------------------"
-        
+          # Create and switch to 'main' branch if it does not exist
+          git checkout -b main
+          echo "---------------------------------------------------------"
+          ls -a
+          echo "---------------------------------------------------------"
+          ls ../ -la
+          echo "---------------------------------------------------------"
+          ls ./
+          echo "---------------------------------------------------------"
+          ls ../target/debug/
+          echo "---------------------------------------------------------"
+          
 
-        # Copy the specific file from the source repository
-        cp ../target/debug/weper_cli ./weper_cli
-        git add weper_cli
-        cp ../target/x86_64-pc-windows-gnu/debug/weper_cli.exe ./weper_cli.exe
-        git add weper_cli.exe
-        cp ../README.md ./README.md
-        git add README.md
+          # Copy the specific file from the source repository
+          cp ../target/debug/weper_cli ./weper_cli
+          git add weper_cli
+          cp ../target/x86_64-pc-windows-gnu/debug/weper_cli.exe ./weper_cli.exe
+          git add weper_cli.exe
+          cp ../README.md ./README.md
+          git add README.md
 
-        # Commit the file
-        git commit -m "Sync weper_cli from source repository"
+          # Commit the file
+          git commit -m "Sync weper_cli from source repository"
 
-        # Add the remote repository URL
-        git remote add origin https://github.com/gaku-tanaka01/weper_exe.git
+          # Add the remote repository URL
+          git remote add origin https://github.com/gaku-tanaka01/weper_exe.git
 
-        # Force push to the destination repository
-       git push origin main --force
-
+          # Force push to the destination repository
+          git push origin main --force
