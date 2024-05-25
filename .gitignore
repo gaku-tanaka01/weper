@@ -1,11 +1,10 @@
-# .target ディレクトリ内のすべてのファイルを無視
+# /target ディレクトリ内のすべてのファイルを無視
 /target/*
 
-# サブディレクトリ内のファイルも無視
-/target/**
-
-# .target/debug/weper_cli と .target/debug/weper_cli.exe を除外して追跡
+# /target/debug/ および /target/x86_64-pc-windows-gnu/ ディレクトリを除外して追跡
 !/target/debug/
-!target/x86_64-pc-windows-gnu/
-!target/x86_64-pc-windows-gnu/weper_cli.exe
+!/target/x86_64-pc-windows-gnu/
+
+# /target/debug/weper_cli および /target/x86_64-pc-windows-gnu/weper_cli.exe を除外して追跡
 !/target/debug/weper_cli
+!/target/x86_64-pc-windows-gnu/weper_cli.exe
