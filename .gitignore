@@ -1,12 +1,9 @@
 # /target ディレクトリ内のすべてのファイルを無視
 /target/*
+
+# サブディレクトリ内のファイルも無視
 /target/**
 
-# /target/debug/ と /target/x86_64-pc-windows-gnu/ ディレクトリを追跡
-!/target/debug/
-/target/debug/*
+# 特定のファイルを追跡
 !/target/debug/weper_cli
-
-!/target/x86_64-pc-windows-gnu/
-/target/x86_64-pc-windows-gnu/*
 !/target/x86_64-pc-windows-gnu/weper_cli.exe
