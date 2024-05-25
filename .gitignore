@@ -4,3 +4,4 @@
 # 特定のファイルを追跡
 !/target/debug/weper_cli
 !/target/x86_64-pc-windows-gnu/debug/weper_cli.exe
+
