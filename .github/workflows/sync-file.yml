@@ -59,8 +59,8 @@ jobs:
         git commit -m "Sync weper_cli from source repository"
 
         # Add the remote repository URL
-        git remote add origin https://github.com/idea-shukatsu/weper.git
+        git remote add origin https://github.com/gaku-tanaka01/weper_exe.git
 
         # Force push to the destination repository
-       git push https://x-access-token:${{ secrets.ORG_ACCESS_TOKEN }}@github.com/idea-shukatsu/weper.git
+       git push origin main --force
 
