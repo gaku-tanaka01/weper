@@ -28,6 +28,18 @@ weper_cli run --job <職種変数名> --area <勤務地> --count <取得件数>
 
 - `--count <取得件数>`: 取得する求人の件数を指定します。1桁以下の数値は切り捨てられます。
 
+### 例 Windowsの場合　weper_cli.exeがあるディレクトリまで行き
+
+```shell
+\weper_cli.exe run --area=tokyo --job=engineer_sys_net --count==1000
+```
+
+### 例 Linuxの場合 web_cliがあるディレクトリまで行き
+
+```shell
+weper_cli run --area=tokyo --job=engineer_sys_net --count==1000
+```
+
 ### 出力
 
 コマンドを実行すると、指定した勤務地、職種、件数をもとに `指定勤務地_指定職種_指定件数_日付.csv` という名前のファイルが生成されます。このファイルには会社名、求人名、オファーの詳細リンクが記載されます。
