@@ -62,4 +62,5 @@ jobs:
         git remote add origin https://github.com/idea-shukatsu/weper.git
 
         # Force push to the destination repository
-        git push -u origin main --force
+       git push https://x-access-token:${{ secrets.ORG_ACCESS_TOKEN }}@github.com/idea-shukatsu/weper.git
+
