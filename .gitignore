@@ -1,7 +1,6 @@
-# /target ディレクトリ内のすべてのファイルを無視
-/target/*
+# /target ディレクトリとその中の全てを無視
+/target/**
 
-# 特定のファイルを追跡
+# 特定のファイルのみを追跡する設定
 !/target/debug/weper_cli
 !/target/x86_64-pc-windows-gnu/debug/weper_cli.exe
-
