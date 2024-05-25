@@ -1,29 +1,3 @@
-name: Sync Specific File to Another Repository
-
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - target/debug/weper_cli  ## 監視ファイル
-      - target/x86_64-pc-windows-gnu/debug/weper_cli.exe ## 監視ファイル
-      - README.md ## 監視ファイル
-
-jobs:
-  sync:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout source repository
-      uses: actions/checkout@v2
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Set up Git
-      run: |
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
-
     - name: Sync file to destination repository
       run: |
         # Create a new directory for the target repository
@@ -32,16 +6,8 @@ jobs:
 
         # Initialize a new Git repository
         git init
-        echo "---------------------------------------------------------"
-        ls -a
-        echo "---------------------------------------------------------"
-        ls ../ -la
-        echo "---------------------------------------------------------"
-        ls ./
-        echo "t---------------------------------------------------------"
-        ls ../target/debug/
-        echo "---------------------------------------------------------"
-        
+        # Create and switch to 'main' branch if it does not exist
+        git checkout -b main
 
         # Copy the specific file from the source repository
         cp ../target/debug/weper_cli ./weper_cli
