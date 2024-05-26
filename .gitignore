@@ -4,19 +4,30 @@
 # /taget/debug,  /taget/x86_64-pc-windows-gnuを除外 
 
 !/target/debug/
+!/target/release/
 !/target/x86_64-pc-windows-gnu/
 
 # /target/debug, /target/x86_64-pc-windows-gnu以下のディレクトリを無視 
 /target/debug/*
+/target/release/*
+
 /target/x86_64-pc-windows-gnu/*
+!/target/x86_64-pc-windows-gnu/release/
+/target/x86_64-pc-windows-gnu/release/*
+
 
 # /target/x86_64-pc-windows-gnu/debugは除外
 !/target/x86_64-pc-windows-gnu/debug/
+!/target/x86_64-pc-windows-gnu/release/
+
+
 
 
 # /target/debug/weper_cli は除外
 !/target/debug/weper_cli
+!/target/release/weper_cli
 
 # /target/x86_64-pc-windows-gnu/debug/weper_cli.exe は除外
 !/target/x86_64-pc-windows-gnu/debug/weper_cli.exe
+!/target/x86_64-pc-windows-gnu/release/weper_cli.exe
 
