@@ -3,8 +3,8 @@ name: Sync File F to Repository R2
 on:
   push:
     paths:
-      - '/target/release/weper_cli'
-      - '/target/x86_64-pc-windows-gnu/releas/weper_cli.exe'
+      - 'target/release/weper_cli'
+      - 'target/x86_64-pc-windows-gnu/releas/weper_cli.exe'
       - 'README.md'
 
 
@@ -19,10 +19,8 @@ jobs:
 
     - name: Copy Application
       run: |
-        pwd
-        ls /
-        cp /target/release/weper_cli $GITHUB_WORKSPACE/
-        cp /target/x86_64-pc-windows-gnu/releas/weper_cli.exe $GITHUB_WORKSPACE/
+        cp target/release/weper_cli $GITHUB_WORKSPACE/
+        cp target/x86_64-pc-windows-gnu/releas/weper_cli.exe $GITHUB_WORKSPACE/
         cp README.md $GITHUB_WORKSPACE/
 
     - name: Checkout Repository R2
