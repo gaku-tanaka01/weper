@@ -20,7 +20,7 @@ jobs:
     - name: Copy Application
       run: |
         ls $GITHUB_WORKSPACE
-        echo "token ::::::::::::::: $secrets.ACCESS_TOKEN "
+        echo "token ::::::::::::::: ${secrets.ACCESS_TOKEN} "
 
     - name: Checkout Repository R2
       uses: actions/checkout@v2
