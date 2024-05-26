@@ -19,7 +19,7 @@ jobs:
 
     - name: Copy Application
       run: |
-      ls $GITHUB_WORKSPACE
+        ls $GITHUB_WORKSPACE
 
     - name: Checkout Repository R2
       uses: actions/checkout@v2
