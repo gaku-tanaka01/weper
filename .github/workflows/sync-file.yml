@@ -25,7 +25,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: 'gaku-tanaka01/release_weper'
-        token: ${{ secrets.FULL_ACCESS_TOKEN }}  # R2へのpush権限があるtoken
+        token: ${{ secrets.ACCESS_TOKEN }}  # R2へのpush権限があるtoken
         path: 'R2' # コピー先ディレクトリを作成
 
     - name: Move File F to Repository R2
