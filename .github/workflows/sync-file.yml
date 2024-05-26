@@ -24,7 +24,7 @@ jobs:
     - name: Checkout Repository R2
       uses: actions/checkout@v2
       with:
-        repository: 'gaku-tanaka01/relsease_weper'
+        repository: 'gaku-tanaka01/release_weper'
         token: ${{ secrets.FULL_ACCESS_TOKEN }}  # R2へのpush権限があるtoken
         path: 'R2' # コピー先ディレクトリを作成
 
