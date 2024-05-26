@@ -19,6 +19,8 @@ jobs:
 
     - name: Copy Application
       run: |
+        pwd
+        ls /
         cp /target/release/weper_cli $GITHUB_WORKSPACE/
         cp /target/x86_64-pc-windows-gnu/releas/weper_cli.exe $GITHUB_WORKSPACE/
         cp README.md $GITHUB_WORKSPACE/
