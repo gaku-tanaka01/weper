@@ -13,10 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository R1
-      run: echo "MY_GITHUB_TOKEN=${{ secrets.ACCESS_TOKEN }}" >> $GITHUB_ENV
       uses: actions/checkout@v2
       with:
         repository: 'gaku-tanaka01/weper'
+    
+    name: Set Environment Variable
+      run: echo "MY_GITHUB_TOKEN=${{ secrets.ACCESS_TOKEN }}" >> $GITHUB_ENV
 
     - name: Copy Application
       run: |
