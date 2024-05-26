@@ -31,14 +31,12 @@ jobs:
     - name: Move File F to Repository R2
       run: |
         ls $GITHUB_WORKSPACE/
-        mv $GITHUB_WORKSPACE/weper_cli R2/
-        mv $GITHUB_WORKSPACE/weper_cli.exe R2/ 
+        mv $GITHUB_WORKSPACE/target/release/weper_cli R2/
+        mv $GITHUB_WORKSPACE/target/x86_64-pc-windows-gnu/release/weper_cli.exe R2/ 
 
     - name: Commit and Push
       run: |
         cd R2
-        git config --local user.email "tanaka"
-        git config --local user.name "your_username"
         git add .
         git commit -m "Update file F from R1"
         git push
