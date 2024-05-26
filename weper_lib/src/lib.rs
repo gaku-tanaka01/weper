@@ -2,7 +2,9 @@ use reqwest::header;
 use scraper::{Html, Selector};
 use std::error::Error;
 
-pub async fn get_html(url: &str) -> Result<Html, reqwest::Error> {
+pub mod google;
+
+pub async fn get_html(url: &str) -> Result<Html, Box<dyn Error>> {
     let client = reqwest::Client::new();
 
     let response = client.get(url)
@@ -18,7 +20,7 @@ pub fn extract_text_from_element(element: &scraper::ElementRef<'_>, selector: &S
         .map_or("".to_string(), |element| element.text().collect::<String>())
 }
 
-// aタグのhrefリンクを抽出
+// 要素内の最初のaタグのhrefリンクを抽出
 pub fn extract_link_from_href(element: &scraper::ElementRef<'_>) -> Result<String, Box<dyn Error>> {
     let href = element.select(&Selector::parse("a")?)
         .next().map_or("".to_string(), 
@@ -79,7 +81,3 @@ fn test_extract_link_from_href() {
     assert_eq!(result.unwrap(), "/company/1/job/1".to_string());
 }
 }
-
-
-
-

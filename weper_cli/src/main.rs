@@ -1,4 +1,4 @@
-use weper_lib;
+use weper_lib::{self, google};
 use green;
 use config::Cli;
 use config;
@@ -10,7 +10,6 @@ use std::io::Write;
 use std::io;
 use chrono::Local;
 use csv_config;
-
 #[tokio::main]
 async fn main() {
 
@@ -71,6 +70,7 @@ async fn main() {
     //BufWriterをCSVWriterに変換
     let mut writer = csv::Writer::from_writer(buf_writer);
 
+    /* CSVファイルに書き込みをする。 */
     for i in 0..count.map(|c| c / green::GREEN_OFFER_PER_PAGE).unwrap_or(1) {
 
         //page指定をURLの末尾に追加
@@ -82,14 +82,41 @@ async fn main() {
             Err(e) => panic!("HTML取得エラー: {}", e),
         };
 
-        let offers_info = match green::get_offer_info(&html) {
+        let mut offers_info = match green::get_offer_info(&html) {
             Ok(offers_info) => offers_info,
             Err(e) => panic!("オファーオブジェクトの取得に失敗しました。\nerror:{}", e),
         };
+
+        for object in &mut offers_info {
+            let html_for_hp =match google::search_google_for_html_with(&format!("{} HP", &object.company_name)).await {
+                Ok(html) => html,
+                Err(e) => {
+                    eprintln!("Google検索結果取得エラー：{}", e);
+                    continue;
+                }
+            };
+
+            let first_element_for_hp = match google::get_first_google_result_html_elemnt(&html_for_hp) {
+                Ok(element) => element,
+                Err(e) => {
+                    eprintln!("{}　HP要素取得エラー：{}", &object.company_name, e);
+                    continue;
+                }
+            };
+
+            //offer_infoにHPリンクを追加
+             match weper_lib::extract_link_from_href(&first_element_for_hp) {
+                Ok(link) => object.hp_link = Some(link),
+                Err(_) => object.hp_link =  Some("URL取得失敗".to_string())
+            };            
+        }
         
         match csv_config::write_to_csv(&mut writer, &offers_info) {
             Ok(_) => println!("検索結果{}ページ目の書き込み完了", i+1),
-            Err(e) => panic!("検索結果{}ページ目の書き込み失敗\nerror:{}", i+1, e),
+            Err(e) => {
+                eprintln!("検索結果{}ページ目の書き込み失敗\nerror:{}", i+1, e);
+                continue;
+            },
         };
     }
     println!("正常に完了しました。");

@@ -19,6 +19,8 @@ pub struct GreenOfferInfo {
     pub job_title: String,
     #[serde(rename = "オファー詳細URL")]
     pub offer_link: String,
+    #[serde(rename = "HPリンク")]
+    pub hp_link: Option<String>
 }
 
 //Green求人検索結果のHTMLから求人情報を抽出します.
@@ -33,7 +35,7 @@ pub fn get_offer_info(html: &Html) -> Result<Vec<GreenOfferInfo>, Box<dyn Error>
         let offer_link= weper_lib::extract_link_from_href(&element)?;
         let company_name = weper_lib::extract_text_from_element(&element, &company_name_selector);
         let job_title = weper_lib::extract_text_from_element(&element, &job_title_selector);
-        result.push(GreenOfferInfo { company_name, job_title, offer_link });
+        result.push(GreenOfferInfo { company_name: company_name, job_title: job_title, offer_link: offer_link, hp_link:None });
     }
     Ok(result)
 }
@@ -180,11 +182,13 @@ mod tests {
             company_name: "Company A".to_string(),
             job_title: "Software Engineer".to_string(),
             offer_link: "/company/1/job/1".to_string(),
+            hp_link: None
         },
         GreenOfferInfo {
             company_name: "Company B".to_string(),
             job_title: "Product Manager".to_string(),
             offer_link: "/company/2/job/2".to_string(),
+            hp_link: None
         },
     ];
 

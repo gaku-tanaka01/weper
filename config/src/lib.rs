@@ -1,4 +1,4 @@
-use clap::{self, Subcommand, Parser};
+use clap::{self, Subcommand};
 
 #[derive(clap::Parser,Debug)]
 #[command(name = "weper_cli")]
