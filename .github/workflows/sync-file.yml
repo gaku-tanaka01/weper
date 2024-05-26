@@ -1,65 +1,45 @@
-name: Sync Specific File to Another Repository
+name: Sync File F to Repository R2
 
 on:
   push:
-    branches:
-      - main
     paths:
-      - target/debug/weper_cli  ## 監視ファイル
-      - target/x86_64-pc-windows-gnu/debug/weper_cli.exe ## 監視ファイル
-      - README.md ## 監視ファイル
+      - '/target/release/weper_cli'
+      - '/target/x86_64-pc-windows-gnu/releas/weper_cli.exe'
+      - 'README.md'
+
 
 jobs:
   sync:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout source repository
-        uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.ORG_ACCESS_TOKEN }}
+    - name: Checkout Repository R1
+      uses: actions/checkout@v2
+      with:
+        repository: 'gaku-tanaka01/weper'
 
-      - name: Set up Git
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+    - name: Copy Application
+      run: |
+        cp /target/release/weper_cli $GITHUB_WORKSPACE/
+        cp /target/x86_64-pc-windows-gnu/releas/weper_cli.exe $GITHUB_WORKSPACE/
+        cp README.md $GITHUB_WORKSPACE/
 
-      - name: Sync file to destination repository
-        run: |
-          # Create a new directory for the target repository
-          mkdir target-repo
-          cd target-repo
+    - name: Checkout Repository R2
+      uses: actions/checkout@v2
+      with:
+        repository: 'gaku-tanaka01/relsease_weper'
+        token: ${{ secrets.FULL_ACCESS_TOKEN }}  # R2へのpush権限があるtoken
+        path: 'R2' # コピー先ディレクトリを作成
 
-          # Initialize a new Git repository
-          git init
-          echo "---------------------------------------------------------"
+    - name: Move File F to Repository R2
+      run: |
+        mv $GITHUB_WORKSPACE/weper_cli R2/
+        mv $GITHUB_WORKSPACE/weper_cli.exe R2/ 
 
-          # Create and switch to 'main' branch if it does not exist
-          git checkout -b main
-          echo "---------------------------------------------------------"
-          ls -a
-          echo "---------------------------------------------------------"
-          ls ../ -la
-          echo "---------------------------------------------------------"
-          ls ./
-          echo "---------------------------------------------------------"
-          ls ../target/debug/
-          echo "---------------------------------------------------------"
-          
-
-          # Copy the specific file from the source repository
-          cp ../target/debug/weper_cli ./weper_cli
-          git add weper_cli
-          cp ../target/x86_64-pc-windows-gnu/debug/weper_cli.exe ./weper_cli.exe
-          git add weper_cli.exe
-          cp ../README.md ./README.md
-          git add README.md
-
-          # Commit the file
-          git commit -m "Sync weper_cli from source repository"
-
-          # Add the remote repository URL
-          git remote add origin https://github.com/gaku-tanaka01/weper_exe.git
-
-          # Force push to the destination repository
-          git push origin main --force
+    - name: Commit and Push
+      run: |
+        cd R2
+        git config --local user.email "tanaka"
+        git config --local user.name "your_username"
+        git add .
+        git commit -m "Update file F from R1"
+        git push
