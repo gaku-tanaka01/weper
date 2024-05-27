@@ -1,6 +1,8 @@
 use reqwest::header;
 use scraper::{Html, Selector};
 use std::error::Error;
+use std::fs::{self, OpenOptions};
+use std::io;
 
 pub mod google;
 
@@ -26,6 +28,28 @@ pub fn extract_link_from_href(element: &scraper::ElementRef<'_>) -> Result<Strin
         .next().map_or("".to_string(), 
         |element| element.attr("href").unwrap_or("").to_string());
     Ok(href)
+}
+
+pub fn create_unique_file(filename :&str) -> Result<fs::File, Box<dyn Error>> {
+    let mut index = 1;
+    loop {
+        let unique_filename = format!("{}({}).html", &filename, index);
+        let result = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&unique_filename);
+
+        match result {
+            Ok(file) => {
+                println!("File created: {}", unique_filename);
+                return Ok(file)
+            }
+            Err(ref e) if e.kind() == io::ErrorKind::AlreadyExists => {
+                index += 1; // Increment the index and try the next file name
+            }
+            Err(e) => return Err(Box::new(e) as Box<dyn Error>),  // Propagate other kinds of errors
+        }
+    }
 }
 
 #[cfg(test)]
