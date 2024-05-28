@@ -19,22 +19,25 @@ pub enum Commands {
 #[derive(clap::Args, Debug)]
 pub struct RunArgs {
     /// 指定された職種の求人を検索します。
-    #[arg(short, long, help = "職種の指定 例: engineer_sys_net")]
-    job: Option<String>,
+    #[arg(short, long, help = "大職種の指定 例: engineer", conflicts_with = "sub_job")]
+    pub main_job: Option<String>,
+
+    #[arg(short, long, help = "小職種の指定 例: backend", conflicts_with = "main_job")]
+    pub sub_job: Option<String>,
 
     /// 指定された地域の求人を検索します。
     #[arg(short, long, help = "地域の指定 例: tokyo")]
-    area: Option<String>,
+    pub area: Option<String>,
 
     /// 取得する求人情報の数を指定します。
     #[arg(short, long, help = "取得する求人数の指定")]
-    count: Option<u32>,
+    pub count: Option<u32>,
 }
 
-pub fn get_cli_args(cli: Cli) -> (Option<String>, Option<String>, Option<u32>) {
+pub fn get_cli_args(cli: Cli) -> (Option<String>, Option<String>, Option<String>, Option<u32>) {
     match cli.commands {
         Commands::Run(args) => {
-            (args.job, args.area, args.count)
+            (args.main_job, args.sub_job, args.area, args.count)
         }
     }
 }
@@ -44,26 +47,32 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_get_cli_args() {
-        let args = RunArgs { job: Some("test_job".to_string()), 
+    fn test_get_cli_args_with_main_job() {
+        let args = RunArgs { main_job: Some("test_job".to_string()), 
+                                    sub_job: None,
                                       area: Some("test_area".to_string()),
                                       count: Some(1),
                                     };
         
         let cli = Cli { commands: Commands::Run(args) };
 
-        let (job, area, count) = get_cli_args(cli);
+        let (main_job, sub_job, area, count) = get_cli_args(cli);
 
-        assert_eq!(job.unwrap(), "test_job");
+        assert_eq!(main_job.unwrap(), "test_job");
+        assert_eq!(sub_job, None);
         assert_eq!(area.unwrap(), "test_area");
         assert_eq!(count.unwrap(), 1);
+                                }
 
-        let args = RunArgs { job: None, area: None, count: None };
+    #[test]
+    fn test_get_cli_args_without_all_args() {
+        let args = RunArgs { main_job: None, sub_job: None, area: None, count: None };
         let cli = Cli { commands: Commands::Run(args) };
 
-        let (job, area, count) = get_cli_args(cli);
+        let (main_job, sub_job, area, count) = get_cli_args(cli);
 
-        assert_eq!(job, None);
+        assert_eq!(main_job, None);
+        assert_eq!(sub_job, None);
         assert_eq!(area, None);
         assert_eq!(count, None);
     }
