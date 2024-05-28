@@ -179,6 +179,3 @@ weper_cli run --main-job engineer --sub-job backend --area tokyo --count 5
 ```bash
 .\weper_cli.exe run --main-job engineer --sub-job backend --area tokyo --count 5
 ```
-
-
-さらなる支援が必要な場合や問題を報告する場合は、GitHubのプロジェクトリポジトリを参照してください。

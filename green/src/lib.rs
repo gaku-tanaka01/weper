@@ -15,6 +15,7 @@ use weper_lib::google;
 // green転職サービスのエンジニア職種から1ページ目を検索結果から、会社名と求人タイトルを出力
 // 検索結果は1ページ10件表示される？？　これは数えたほうがいいかも.
 pub const GREEN_OFFER_PER_PAGE: u32 = 10;
+pub const GREEN_BASE_URL: &str = "https://www.green-japan.com";
 
 #[derive(Debug, PartialEq, serde::Serialize)]
 pub struct GreenOfferInfo {
@@ -49,7 +50,12 @@ pub fn get_offer_info(html: &Html) -> Result<Vec<GreenOfferInfo>, Box<dyn Error>
 
     let mut result = vec![];
     for element in html.select(&offer_wrapper_selector) {
-        let offer_link = weper_lib::extract_link_from_href(&element)?;
+        let offer_link = format!(
+            "{}{}",
+            GREEN_BASE_URL,
+            weper_lib::extract_link_from_href(&element)?
+        );
+
         let company_name = weper_lib::extract_text_from_element(&element, &company_name_selector);
         let job_title = weper_lib::extract_text_from_element(&element, &job_title_selector);
         result.push(GreenOfferInfo {
@@ -80,7 +86,7 @@ pub fn get_pages_count_from_html(html: &Html) -> Result<u32, Box<dyn Error>> {
 //理由としては　なにか条件を指定しないとgreenのリザルト画面が異なるため。
 
 pub fn create_search_url(area_id: Option<&str>, job_id: Option<&str>) -> String {
-    let mut url = String::from("https://www.green-japan.com");
+    let mut url = String::from(GREEN_BASE_URL);
     match (area_id, job_id) {
         (Some(area_id), Some(job_id)) => {
             url.push_str(&format!("/search/area/{}/job/{}", area_id, job_id));
@@ -276,7 +282,7 @@ mod tests {
     #[test]
     fn test_create_search_url() {
         let url = create_search_url(Some("1"), Some("2"));
-        assert_eq!(url, "https://www.green-japan.com/search/area/1/job/2");
+        assert_eq!(url, format!("{}/search/area/1/job/2", GREEN_BASE_URL));
     }
 
     #[test]
@@ -300,25 +306,25 @@ mod tests {
     #[test]
     fn test_create_search_url_with_only_area_id() {
         let url = create_search_url(Some("1"), None);
-        assert_eq!(url, "https://www.green-japan.com/area/1");
+        assert_eq!(url, format!("{}/area/1", GREEN_BASE_URL));
     }
 
     #[test]
     fn test_create_serach_url_with_only_maijor_job_id() {
         let url = create_search_url(None, Some("190"));
-        assert_eq!(url, "https://www.green-japan.com/jobtype-h/190");
+        assert_eq!(url, format!("{}/jobtype-h/190", GREEN_BASE_URL));
     }
 
     #[test]
     fn test_create_search_url_with_only_minor_job_id() {
         let url = create_search_url(None, Some("190110"));
-        assert_eq!(url, "https://www.green-japan.com/jobtype-l/190110");
+        assert_eq!(url, format!("{}/jobtype-l/190110", GREEN_BASE_URL));
     }
 
     #[test]
     fn test_create_search_url_with_no_condition() {
         let url = create_search_url(None, None);
-        assert_eq!(url, "https://www.green-japan.com/area/13");
+        assert_eq!(url, format!("{}/area/13", GREEN_BASE_URL));
     }
 
     #[tokio::test]
