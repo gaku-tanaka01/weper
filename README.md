@@ -27,8 +27,8 @@ weper_cli run --main-job <main_job_id> --sub-job <sub_job_id> --area <area_id> -
 ### オプション
 - `--main-job <main_job_id>`: 主な職種カテゴリを指定します。
 - `--sub-job <sub_job_id>`: 副職種カテゴリを指定します。
-- `--area <area_id>`: 地理的なエリアを指定します。
-- `--count <count>`: 取得する結果の数を指定します。1桁の数値を入力してください。
+- `--area <area_id>`: 地理的なエリアを指定します。 `main-job` `sub-job`ともに指定なしの場合、東京が条件指定されます。
+- `--count <count>`: 取得する結果の数を指定します。10桁単位で入力してください　1桁以下は切り捨てされます。
 
 ### 主な職種カテゴリ (`main-job`)
 主な職種カテゴリの値には以下が含まれます:
@@ -168,15 +168,16 @@ weper_cli run --main-job <main_job_id> --sub-job <sub_job_id> --area <area_id> -
 - `full_remote` フルリモート
 - `overseas` 海外
 
+
 ## 例
 東京でエンジニアのバックエンド職種を検索する場合のCLIツールの実行方法は以下の通りです:
 
 ### Linuxの場合
 ```bash
-weper_cli run --main-job engineer --sub-job backend --area tokyo --count 5
+weper_cli run --main-job engineer --sub-job backend --area tokyo --count 10
 ```
 
 ### Windowsの場合
 ```bash
-.\weper_cli.exe run --main-job engineer --sub-job backend --area tokyo --count 5
+.\weper_cli.exe run --main-job engineer --sub-job backend --area tokyo --count 10
 ```
