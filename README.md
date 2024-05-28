@@ -1,48 +1,184 @@
 # weper_cli
 
-`weper_cli` は、職種、勤務地、取得件数を指定して求人情報をCSV形式で取得するコマンドラインツールです。
+## 概要
+`weper_cli`は、指定された職種や地域の求人情報を取得するためのCLIツールです。
 
-## 使い方
+## インストール方法
+リポジトリをクローンし、プロジェクトディレクトリに移動後、Cargoを使用してビルドしてください。
 
-基本的なコマンド形式は以下の通りです:
+```bash
+cargo build --release
+```
 
-weper_cli run --job <職種変数名> --area <勤務地> --count <取得件数>
+## 基本的な使い方
+ツールを実行するには、以下のコマンド構文を使用します:
+
+### Linuxの場合
+```bash
+weper_cli run --main-job <main_job_id> --sub-job <sub_job_id> --area <area_id> --count <count>
+```
+
+### Windowsの場合
+```bash
+.\weper_cli.exe run --main-job <main_job_id> --sub-job <sub_job_id> --area <area_id> --count <count>
+```
 
 ### オプション
+- `--main-job <main_job_id>`: 主な職種カテゴリを指定します。
+- `--sub-job <sub_job_id>`: 副職種カテゴリを指定します。
+- `--area <area_id>`: 地理的なエリアを指定します。
+- `--count <count>`: 取得する結果の数を指定します。1桁の数値を入力してください。
 
+### 主な職種カテゴリ (`main-job`)
+主な職種カテゴリの値には以下が含まれます:
+- `engineer` エンジニア・技術職（システム/ネットワーク）
+- `creative_web` クリエイティブ職（Web）
+- `creative_game` クリエイティブ職（ゲーム/マルチメディア）
+- `planning_marketing` 企画・マーケティング職
+- `sales` 営業職
+- `management_cxo` 経営・CxO職
+- `account_admin_back_office` 経理・管理・バックオフィス職
+- `assistant_office_work` アシスタント・事務職・オフィスワーク
+- `service_personnel` サービス職（人材/店舗/医療）
+- `specialist_finance` 専門職（金融/不動産/コンサルタント/士業）
+- `engineer_elec_mech` エンジニア・技術職（電気/電子/機械/半導体）
+- `architect_civil_plant` 建築設計・土木・プラント職
 
-- `--job <職種変数名>`: 職種を指定します。以下の変数名を使用できます:
-  - `ENGINEER_SYS_NET`: エンジニア・技術職（システム/ネットワーク）
-  - `CREATIVE_WEB`: クリエイティブ職（Web）
-  - `CREATIVE_GAME_MEDIA`: クリエイティブ職（ゲーム/マルチメディア）
-  - `PLAN_MARKETING`: 企画・マーケティング職
-  - `SALES`: 営業職
-  - `MGMT_CXO`: 経営・CxO職
-  - `ACCOUNT_ADMIN_BACK`: 経理・管理・バックオフィス職
-  - `ASSIST_OFFICE`: アシスタント・事務職・オフィスワーク
-  - `SERVICE_PERSONNEL`: サービス職（人材/店舗/医療）
-  - `SPECIALIST_FINANCE`: 専門職（金融/不動産/コンサルタント/士業）
-  - `ENGINEER_ELEC_MECH`: エンジニア・技術職（電気/電子/機械/半導体）
-  - `ARCH_CIVIL_PLANT`: 建築設計・土木・プラント職
+### 副職種カテゴリ (`sub-job`)
+副職種カテゴリの値には以下が含まれます:
+- `backend` バックエンドエンジニア
+- `frontend` フロントエンドエンジニア
+- `smartphone_app` スマートフォンアプリエンジニア
+- `system_dev_general` システム開発（汎用系）
+- `system_dev_embedded` システム開発（制御・組み込み）
+- `infra_engineer` インフラエンジニア
+- `net_monitor` ネットワーク/サーバ監視・運用・保守・技術サポート
+- `network_engineer` ネットワークエンジニア
+- `package_dev` パッケージソフト・ミドルウェア開発
+- `project_manager` プロジェクトマネージャー（PM）・リーダー
+- `corp_sys_engineer` 社内情報システムエンジニア（社内SE）
+- `product_manager` プロダクトマネージャー
+- `it_consultant` ITコンサルタント・プリセールス
+- `data_scientist` データサイエンティスト
+- `qa_engineer` QAエンジニア・品質保証
+- `other_sys` その他システム関連
+- `web_designer` Webデザイナー
+- `ui_ux_designer` UI/UXデザイナー
+- `web_coder` Webコーダー・HTMLコーダー
+- `web_producer` Webプロデューサー・Webディレクター
+- `web_content` Webサービス・コンテンツ企画
+- `web_writer` Webライター・Web編集・コピーライター
+- `marketing_pr` マーケ・広告宣伝・販促・PR
+- `business_planning` 事業企画・事業統括
+- `web_consultant_seo_sem` Webコンサルタント・SEO・SEM
+- `product_planning` 商品企画・サービス企画
+- `new_business_sales` 新規開拓営業
+- `agency_sales` 代理店営業・パートナーセールス
+- `planning_sales` 企画営業・アカウントプランナー
+- `route_sales` ルートセールス
+- `inside_sales` 内勤営業・インサイドセールス
+- `sales_manager` 営業マネージャー・営業管理職
+- `sales_planning` 営業企画
+- `overseas_sales` 海外営業
+- `tech_sales` セールスエンジニア・技術営業（FAE）
+- `medical_sales` 医療営業（MR/MS）
+- `customer_success` カスタマーサクセス
+- `other_sales` その他営業関連
+- `hr_admin` 人事・総務
+- `finance_accounting` 財務・会計・経理
+- `public_relations` 広報・IR
+- `legal_compliance` 法務（コンプライアンス）・知的財産・特許
+- `general_office` 一般事務・営業事務・庶務・秘書
+- `interpreter_translator` 通訳・翻訳
+- `logistics_trade` 物流管理・貿易事務
+- `customer_service` カスタマーサービス（CS）・ユーザーサポート
+- `other_office` その他受付・企画・事務関連
+- `store_manager` 店長・販売・店舗管理・接客
+- `supervisor_area_manager` スーパーバイザー（SV）・エリアマネージャー
+- `medical_care` 医療・福祉・介護サービス
+- `career_consultant` キャリアコンサルタント/コーディネーター・カウンセラー
+- `purchasing_procurement` 購買・調達・MD・バイヤー・店舗開発
+- `call_center_operator` コールセンター運営・オペレーター
+- `other_service` その他サービス関連
+- `finance_insurance_fp` 金融・保険・ファイナンシャルプランナー（FP）
+- `real_estate_consultant` 不動産・住宅コンサルタント
+- `strategy_consultant` 経営・戦略コンサルタント
+- `accounting_consultant` 財務・会計コンサルタント
+- `org_hr_consultant` 組織・人事コンサルタント
+- `other_consultant` その他コンサル・専門職関連
+- `production_tech_process_dev` 生産技術（設備）・生産管理・プロセス開発
+- `auto_construction_machinery` 自動車・建機・輸送機器
+- `analog_digital_semi` アナログ/デジタル半導体・システム・回路設計
+- `precision_electronic_instrument` 精密機器・電子機器・計測機器
+- `other_tech` その他技術関連
+- `construction_management` 施工管理・環境調査・分析
+- `survey_design_estimation` 測量・設計・積算・計装
+- `other_arch_civil_plant` その他建築・土木・プラント関連
 
-- `--area <勤務地>`: 勤務地をアルファベットで指定します。大文字小文字は区別されません。特殊な勤務地として `full_remote` (フルリモート)、`overseas` (海外) も指定可能です。
+### 地域 (`area`)
+地域の値には以下が含まれます:
+- `tokyo` 東京都
+- `kanagawa` 神奈川県
+- `chiba` 千葉県
+- `saitama` 埼玉県
+- `ibaraki` 茨城県
+- `tochigi` 栃木県
+- `gunma` 群馬県
+- `hokkaido` 北海道
+- `aomori` 青森県
+- `iwate` 岩手県
+- `miyagi` 宮城県
+- `akita` 秋田県
+- `yamagata` 山形県
+- `fukushima` 福島県
+- `niigata` 新潟県
+- `toyama` 富山県
+- `ishikawa` 石川県
+- `fukui` 福井県
+- `yamanashi` 山梨県
+- `nagano` 長野県
+- `aichi` 愛知県
+- `gifu` 岐阜県
+- `shizuoka` 静岡県
+- `mie` 三重県
+- `osaka` 大阪府
+- `hyogo` 兵庫県
+- `kyoto` 京都府
+- `shiga` 滋賀県
+- `nara` 奈良県
+- `wakayama` 和歌山県
+- `tottori` 鳥取県
+- `shimane` 島根県
+- `okayama` 岡山県
+- `hiroshima` 広島県
+- `yamaguchi` 山口県
+- `tokushima` 徳島県
+- `kagawa` 香川県
+- `ehime` 愛媛県
+- `kochi` 高知県
+- `fukuoka` 福岡県
+- `saga` 佐賀県
+- `nagasaki` 長崎県
+- `kumamoto` 熊本県
+- `oita` 大分県
+- `miyazaki` 宮崎県
+- `kagoshima` 鹿児島県
+- `okinawa` 沖縄県
+- `full_remote` フルリモート
+- `overseas` 海外
 
-- `--count <取得件数>`: 取得する求人の件数を指定します。1桁以下の数値は切り捨てられます。
+## 例
+東京でエンジニアのバックエンド職種を検索する場合のCLIツールの実行方法は以下の通りです:
 
-### 例：Windowsの場合　weper_cli.exeがあるディレクトリまで行き
-
-```shell
-.\weper_cli.exe run --area=tokyo --job=engineer_sys_net --count=1000
+### Linuxの場合
+```bash
+weper_cli run --main-job engineer --sub-job backend --area tokyo --count 5
 ```
 
-### 例：Linuxの場合 web_cliがあるディレクトリまで行き
-
-
-```shell
-weper_cli run --area=tokyo --job=engineer_sys_net --count=1000
+### Windowsの場合
+```bash
+.\weper_cli.exe run --main-job engineer --sub-job backend --area tokyo --count 5
 ```
 
-### 出力
 
-コマンドを実行すると、指定した勤務地、職種、
-件数をもとに `指定勤務地_指定職種_指定件数_日付.csv` という名前のファイルが生成されます。このファイルには会社名、求人名、オファーの詳細リンクが記載されます。
+さらなる支援が必要な場合や問題を報告する場合は、GitHubのプロジェクトリポジトリを参照してください。
