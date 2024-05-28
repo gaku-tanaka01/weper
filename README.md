@@ -3,12 +3,13 @@
 ## 概要
 `weper_cli`は、指定された職種や地域の求人情報を取得するためのCLIツールです。
 
-## インストール方法
-リポジトリをクローンし、プロジェクトディレクトリに移動後、Cargoを使用してビルドしてください。
+## weper_cliの実行ファイルの場所
 
-```bash
-cargo build --release
-```
+### Linuxの場合
+https://github.com/gaku-tanaka01/weper/blob/main/target/release/weper_cli
+
+### Windowsの場合
+https://github.com/gaku-tanaka01/weper/blob/main/target/x86_64-pc-windows-gnu/release/weper_cli.exe
 
 ## 基本的な使い方
 ツールを実行するには、以下のコマンド構文を使用します:
