@@ -16,19 +16,26 @@ https://github.com/gaku-tanaka01/weper/blob/main/target/x86_64-pc-windows-gnu/re
 
 ### Linuxの場合
 ```bash
-weper_cli run --main-job <main_job_id> --sub-job <sub_job_id> --area <area_id> --count <count>
+weper_cli run --main-job <main job tag> --sub-job <sub job tag> --area <prefecture> --count <count>
 ```
 
 ### Windowsの場合
 ```bash
-.\weper_cli.exe run --main-job <main_job_id> --sub-job <sub_job_id> --area <area_id> --count <count>
+.\weper_cli.exe run --main-job <main job tag> --sub-job <sub job tag> name--area <prefecture> --count <count>
 ```
 
 ### オプション
-- `--main-job <main_job_id>`: 主な職種カテゴリを指定します。
-- `--sub-job <sub_job_id>`: 副職種カテゴリを指定します。
-- `--area <area_id>`: 地理的なエリアを指定します。 `main-job` `sub-job`ともに指定なしの場合、東京が条件指定されます。
-- `--count <count>`: 取得する結果の数を指定します。10桁単位で入力してください　1桁以下は切り捨てされます。
+- `--main-job <main job tag>`  
+  主な職種カテゴリを指定します。 `sub-job`と同時に指定はできません。
+- `--sub-job <sub job tag>`  
+  副職種カテゴリを指定します。 `main-job`と同時に指定はできません。
+- `--area <area_id>`  
+  地理的なエリアを指定します。  
+  `main-job`または`sub-job`の指定がないとき、自動で東京エリアが指定されます。
+
+- `--count <count>`  
+  取得する結果の数を指定します。10桁単位で入力してください　1桁以下は切り捨てされます。
+
 
 ### 主な職種カテゴリ (`main-job`)
 主な職種カテゴリの値には以下が含まれます:
