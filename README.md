@@ -181,10 +181,10 @@ weper_cli run --main-job <main job tag> --sub-job <sub job tag> --area <prefectu
 
 ### Linuxの場合
 ```bash
-weper_cli run --main-job engineer --sub-job backend --area tokyo --count 10
+weper_cli run --sub-job backend --area tokyo --count 10
 ```
 
 ### Windowsの場合
 ```bash
-.\weper_cli.exe run --main-job engineer --sub-job backend --area tokyo --count 10
+.\weper_cli.exe run --sub-job backend --area tokyo --count 10
 ```
