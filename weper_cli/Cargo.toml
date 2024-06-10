@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 weper_lib = { path = "../weper_lib" }
 green = { path = "../green" }
+indeed = { path = "../indeed" }
 config = { path = "../config" }
 csv_config = { path = "../csv_config" }
 tokio = {version="1.36", features=["full"]}

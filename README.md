@@ -16,12 +16,37 @@ https://github.com/gaku-tanaka01/weper/blob/main/target/x86_64-pc-windows-gnu/re
 
 ### Linuxの場合
 ```bash
-weper_cli run --main-job <main job tag> --sub-job <sub job tag> --area <prefecture> --count <count>
+weper_cli run <SiteName>
 ```
 
 ### Windowsの場合
 ```bash
-.\weper_cli.exe run --main-job <main job tag> --sub-job <sub job tag> name--area <prefecture> --count <count>
+.\weper_cli.exe run <SiteName>
+```
+
+## サイト固有のオプションについて
+
+### Indeedの場合
+
+### Linuxの場合
+```bash
+weper_cli run indeed --job-word <検索したい職の名前> --area_word <検索したいエリア> --count <15の倍数の数>
+```
+
+### Windowsの場合
+```bash
+.\weper_cli run indeed --job-word <検索したい職の名前> --area_word <検索したいエリア> --count <15の倍数の数>
+```
+
+### Greenの場合
+### Linux 
+```bash
+weper_cli run green --main-job <main job tag> --sub-job <sub job tag> --area <prefecture> --count <count>
+```
+
+### Windowsの場合
+```bash
+.\weper_cli.exe run green --main-job <main job tag> --sub-job <sub job tag> name--area <prefecture> --count <count>
 ```
 
 ### オプション
@@ -179,12 +204,27 @@ weper_cli run --main-job <main job tag> --sub-job <sub job tag> --area <prefectu
 ## 例
 東京でエンジニアのバックエンド職種を検索する場合のCLIツールの実行方法は以下の通りです:
 
+## Green
+
 ### Linuxの場合
 ```bash
-weper_cli run --sub-job backend --area tokyo --count 10
+weper_cli run green --sub-job backend --area tokyo --count 10
 ```
 
 ### Windowsの場合
 ```bash
-.\weper_cli.exe run --sub-job backend --area tokyo --count 10
+.\weper_cli.exe greem run --sub-job backend --area tokyo --count 10
 ```
+
+## Indeed
+
+### Linuxの場合
+```bash
+weper_cli run indeed --job-word エンジニア --area_word 東京 --count 45
+```
+
+### Windowsの場合
+```bash
+.\weper_cli run indeed --job-word エンジニア --area_word 東京 --count 45
+```
+

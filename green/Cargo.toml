@@ -11,5 +11,3 @@ weper_lib = {path = "../weper_lib"}
 config = {path = "../config"}
 csv_config = {path = "../csv_config"}
 tokio = {version="1.36", features=["full"]}
-chrono = "0.4.38"
-

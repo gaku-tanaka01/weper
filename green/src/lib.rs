@@ -1,33 +1,18 @@
-use chrono::Local;
 use config;
 use scraper::{Html, Selector};
-use serde;
 use std::error::Error;
-use weper_lib;
 pub mod id_collections;
 use csv;
 use csv_config;
 use id_collections::{area_id_collection, major_job_type_collection, minor_job_type_collection};
 use std::fs::File;
 use std::io::{BufWriter, Write};
-use weper_lib::google;
+use weper_lib::{self, google};
 
 // green転職サービスのエンジニア職種から1ページ目を検索結果から、会社名と求人タイトルを出力
 // 検索結果は1ページ10件表示される？？　これは数えたほうがいいかも.
-pub const GREEN_OFFER_PER_PAGE: u32 = 10;
-pub const GREEN_BASE_URL: &str = "https://www.green-japan.com";
-
-#[derive(Debug, PartialEq, serde::Serialize)]
-pub struct GreenOfferInfo {
-    #[serde(rename = "会社名")]
-    pub company_name: String,
-    #[serde(rename = "求人タイトル")]
-    pub job_title: String,
-    #[serde(rename = "オファー詳細URL")]
-    pub offer_link: String,
-    #[serde(rename = "HPリンク")]
-    pub hp_link: Option<String>,
-}
+const GREEN_OFFER_PER_PAGE: u32 = 10;
+const GREEN_BASE_URL: &str = "https://www.green-japan.com";
 
 pub enum JobType<'a> {
     Major(&'a str),
@@ -43,30 +28,6 @@ impl<'a> JobType<'a> {
 }
 
 //Green求人検索結果のHTMLから求人情報を抽出します.
-pub fn get_offer_info(html: &Html) -> Result<Vec<GreenOfferInfo>, Box<dyn Error>> {
-    let offer_wrapper_selector = Selector::parse(".card-info__wrapper")?; //求人情報のリンク /company/{id}/job/{id}となっている。
-    let company_name_selector = Selector::parse(".card-info__detail-area__box__title")?; //会社名
-    let job_title_selector = Selector::parse(".card-info__heading-area__title")?; //求人タイトル
-
-    let mut result = vec![];
-    for element in html.select(&offer_wrapper_selector) {
-        let offer_link = format!(
-            "{}{}",
-            GREEN_BASE_URL,
-            weper_lib::extract_link_from_href(&element)?
-        );
-
-        let company_name = weper_lib::extract_text_from_element(&element, &company_name_selector);
-        let job_title = weper_lib::extract_text_from_element(&element, &job_title_selector);
-        result.push(GreenOfferInfo {
-            company_name: company_name,
-            job_title: job_title,
-            offer_link: offer_link,
-            hp_link: None,
-        });
-    }
-    Ok(result)
-}
 
 //Green求人検索結果のHTMLから求人検索結果のページ数を取得します。
 pub fn get_pages_count_from_html(html: &Html) -> Result<u32, Box<dyn Error>> {
@@ -109,11 +70,7 @@ pub fn create_search_url(area_id: Option<&str>, job_id: Option<&str>) -> String 
     url
 }
 
-pub async fn run_green_scraper(args: &config::RunArgs) -> Result<(), Box<dyn Error>> {
-    //日付を取得
-    let now = Local::now();
-    let now_str = now.format("%Y年%m月%d日").to_string();
-
+pub async fn run_green_scraper(args: &config::GreenArgs) -> Result<(), Box<dyn Error>> {
     let (area_name, count_num) = (&args.area, args.count);
     let job_name = match (&args.main_job, &args.sub_job) {
         (Some(job_name), _) => Some(JobType::Major(&job_name)),
@@ -139,11 +96,10 @@ pub async fn run_green_scraper(args: &config::RunArgs) -> Result<(), Box<dyn Err
 
     //CSVファイル名
     let file_name = format!(
-        "{}_{}_{}件_{}.csv",
+        "{}_{}_{}.csv",
         &area_name.as_deref().unwrap_or("東京"),
         &job_name.unwrap_or(JobType::Major("指定なし")).unwrap(),
-        &count_num.unwrap_or(1 * GREEN_OFFER_PER_PAGE),
-        now_str,
+        "green"
     );
 
     let file = File::create(&file_name)?;
@@ -166,7 +122,15 @@ pub async fn run_green_scraper(args: &config::RunArgs) -> Result<(), Box<dyn Err
         //HTMLをURLから取得
         let html = weper_lib::get_html(&url_with_page_num).await?;
 
-        let mut offers_info = get_offer_info(&html)?;
+        let mut offers_info = weper_lib::get_offer_info(
+            &html,
+            &weper_lib::GetOfferInfoParams {
+                base_url: GREEN_BASE_URL,
+                offer_wrapper_selector: ".card-info__wrapper",
+                company_name_selector: ".card-info__detail-area__box__title",
+                job_title_selector: ".card-info__heading-area__title",
+            },
+        )?;
 
         for object in &mut offers_info {
             let html_for_hp =
@@ -181,7 +145,7 @@ pub async fn run_green_scraper(args: &config::RunArgs) -> Result<(), Box<dyn Err
                 };
 
             let first_element_for_hp =
-                match google::get_first_google_result_html_elemnt(&html_for_hp) {
+                match google::get_first_google_result_html_element(&html_for_hp) {
                     Ok(element) => element,
                     Err(e) => {
                         eprintln!("{}　HP要素取得エラー：{}", &object.company_name, e);
@@ -191,8 +155,8 @@ pub async fn run_green_scraper(args: &config::RunArgs) -> Result<(), Box<dyn Err
 
             //offer_infoにHPリンクを追加
             match weper_lib::extract_link_from_href(&first_element_for_hp) {
-                Ok(link) => object.hp_link = Some(link),
-                Err(_) => object.hp_link = Some("URL取得失敗".to_string()),
+                Some(link) => object.hp_link = Some(link),
+                None => object.hp_link = Some("URL取得失敗".to_string()),
             };
         }
 
@@ -206,60 +170,9 @@ pub async fn run_green_scraper(args: &config::RunArgs) -> Result<(), Box<dyn Err
     }
     Ok(())
 }
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tokio;
-
-    #[test]
-    fn test_get_offer_info() {
-        let raw_html = r#"
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <title>Test HTML</title>
-        </head>
-        <body>
-            <div class="srch-rslt">
-                <div class="card-info__wrapper">
-                    <a class="card-info" href="/company/1/job/1">
-                    <div class="card-info__detail-area__box__title">Company A</div>
-                    <div class="card-info__heading-area__title">Software Engineer</div>
-                    </a>
-                </div>
-                <div class="card-info__wrapper">
-                    <a class="card-info" href="/company/2/job/2">
-                    <div class="card-info__detail-area__box__title">Company B</div>
-                    <div class="card-info__heading-area__title">Product Manager</div>
-                    </a>
-                </div>
-            </div>
-        </body>
-        </html>
-        "#;
-        let html = Html::parse_document(raw_html);
-        let result = get_offer_info(&html);
-
-        let expected = vec![
-            GreenOfferInfo {
-                company_name: "Company A".to_string(),
-                job_title: "Software Engineer".to_string(),
-                offer_link: "/company/1/job/1".to_string(),
-                hp_link: None,
-            },
-            GreenOfferInfo {
-                company_name: "Company B".to_string(),
-                job_title: "Product Manager".to_string(),
-                offer_link: "/company/2/job/2".to_string(),
-                hp_link: None,
-            },
-        ];
-
-        assert_eq!(result.unwrap(), expected);
-    }
-
     #[test]
     fn test_get_pages_count_from_html() {
         let raw_html = r#"
@@ -329,10 +242,10 @@ mod tests {
 
     #[tokio::test]
     async fn test_run_green_scraper() {
-        let args = config::RunArgs {
-            main_job: Some("Engineer".to_string()),
-            sub_job: None,
-            area: None,
+        let args = config::GreenArgs {
+            area: Some("tokyo".to_string()),
+            main_job: Some("engineer".to_string()),
+            sub_job: Some("Backend".to_string()),
             count: Some(10),
         };
         let result = run_green_scraper(&args).await;
