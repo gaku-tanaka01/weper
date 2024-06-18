@@ -5,12 +5,6 @@
 
 ## weper_cliの実行ファイルの場所
 
-### Linuxの場合
-https://github.com/gaku-tanaka01/weper/blob/main/target/release/weper_cli
-
-### Windowsの場合
-https://github.com/gaku-tanaka01/weper/blob/main/target/x86_64-pc-windows-gnu/release/weper_cli.exe
-
 ## 基本的な使い方
 ツールを実行するには、以下のコマンド構文を使用します:
 
