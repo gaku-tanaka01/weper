@@ -1,6 +1,4 @@
-name: Release
-permissions:
-  contents: write
+name: Build and Release Binaries
 
 on:
   push:
@@ -8,73 +6,87 @@ on:
       - main
 
 jobs:
-  build:
-    runs-on: ${{ matrix.job.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        job:
-          - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu, use-cross: false, extension: "" }
-          - { os: ubuntu-latest, target: x86_64-unknown-linux-musl, use-cross: true, extension: "" }
-          - { os: ubuntu-latest, target: armv7-unknown-linux-gnueabihf, use-cross: true, extension: "" }
-          - { os: ubuntu-latest, target: armv7-unknown-linux-musleabihf, use-cross: true, extension: "" }
-          - { os: ubuntu-latest, target: aarch64-unknown-linux-gnu, use-cross: true, extension: "" }
-          - { os: ubuntu-latest, target: aarch64-unknown-linux-musl, use-cross: true, extension: "" }
-          - { os: macos-latest, target: x86_64-apple-darwin, use-cross: false, extension: "" }
-          - { os: macos-latest, target: aarch64-apple-darwin, use-cross: false, extension: "" }
-          - { os: windows-latest, target: x86_64-pc-windows-msvc, use-cross: false, extension: .exe }
+  build-and-release-windows:
+    runs-on: windows-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Extract crate information
-        shell: bash
-        run: |
-          echo "PROJECT_NAME=$(sed -n 's/^name = "\(.*\)"/\1/p' Cargo.toml | head -n1)" >> $GITHUB_ENV
-
-      - name: Install Rust toolchain
+      - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          target: ${{ matrix.job.target }}
-          override: true
-          profile: minimal
+          default: true
 
-      - name: Install Dependencies (Ubuntu)
-        if: runner.os == 'Linux'
+      - name: Build Binary for Windows
+        run: cargo build --release --target x86_64-pc-windows-msvc
+
+      - name: Upload Release Asset for Windows
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-binary
+          path: target/x86_64-pc-windows-msvc/release/weper_cli.exe
+
+  build-and-release-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libffi-dev libssl-dev pkg-config
+          sudo apt-get install -y libssl-dev pkg-config
 
-      - name: Install Dependencies (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          brew install openssl pkg-config libffi
-          echo "OPENSSL_DIR=$(brew --prefix openssl)" >> $GITHUB_ENV
-          echo "OPENSSL_INCLUDE_DIR=$(brew --prefix openssl)/include" >> $GITHUB_ENV
-          echo "OPENSSL_LIB_DIR=$(brew --prefix openssl)/lib" >> $GITHUB_ENV
-
-      - name: Build
-        uses: actions-rs/cargo@v1
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
         with:
-          use-cross: ${{ matrix.job.use-cross }}
-          command: build
-          args: --release --target ${{ matrix.job.target }}
-        env:
-          OPENSSL_DIR: ${{ env.OPENSSL_DIR }}
-          OPENSSL_INCLUDE_DIR: ${{ env.OPENSSL_INCLUDE_DIR }}
-          OPENSSL_LIB_DIR: ${{ env.OPENSSL_LIB_DIR }}
-          RUST_BACKTRACE: 1
+          toolchain: stable
+          default: true
 
-      - name: Rename artifacts
-        shell: bash
-        run: |
-          mv target/${{ matrix.job.target }}/release/${{ env.PROJECT_NAME }}{,-${{ github.ref_name }}-${{ matrix.job.target }}${{ matrix.job.extension }}}
+      - name: Build Binary for Linux
+        run: cargo build --release --target x86_64-unknown-linux-gnu
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
+      - name: Upload Release Asset for Linux
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-binary
+          path: target/x86_64-unknown-linux-gnu/release/weper_cli
+
+  create-release:
+    needs: [build-and-release-windows, build-and-release-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: |
-            target/${{ matrix.job.target }}/release/${{ env.PROJECT_NAME }}-${{ github.ref_name }}-${{ matrix.job.target }}${{ matrix.job.extension }}
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.sha }}
+          draft: false
+          prerelease: false
+
+      - name: Upload binaries to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./windows-binary/weper_cli.exe
+          asset_name: weper_cli_windows.exe
+          asset_content_type: application/octet-stream
+
+      - name: Upload binaries to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./linux-binary/weper_cli
+          asset_name: weper_cli_linux
+          asset_content_type: application/octet-stream
