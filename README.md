@@ -221,4 +221,3 @@ weper_cli run indeed --job-word エンジニア --area_word 東京 --count 45
 ```bash
 .\weper_cli run indeed --job-word エンジニア --area_word 東京 --count 45
 ```
-
