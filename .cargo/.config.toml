@@ -1,2 +1,8 @@
 [target.x86_64-pc-windows-gnu]
 linker = "x86_64-w64-mingw32-gcc"
+
+[target.aarch64-unknown-linux-gnu]
+linker = "aarch64-linux-gnu-gcc"
+openssl_dir = "/usr/lib/ssl"
+openssl_include_dir = "/usr/include/openssl"
+openssl_lib_dir = "/usr/lib/ssl"
