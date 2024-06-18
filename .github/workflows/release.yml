@@ -40,19 +40,19 @@ jobs:
           override: true
           profile: minimal
 
-      - name: Install OpenSSL (Ubuntu)
+      - name: Install Dependencies (Ubuntu)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y pkg-config libssl-dev
+          sudo apt-get install -y libffi-dev libssl-dev pkg-config
 
-      - name: Install OpenSSL (macOS)
+      - name: Install Dependencies (macOS)
         if: runner.os == 'macOS'
         run: |
-          brew install openssl
-          echo "export OPENSSL_DIR=$(brew --prefix openssl)" >> $GITHUB_ENV
-          echo "export OPENSSL_INCLUDE_DIR=$OPENSSL_DIR/include" >> $GITHUB_ENV
-          echo "export OPENSSL_LIB_DIR=$OPENSSL_DIR/lib" >> $GITHUB_ENV
+          brew install openssl pkg-config libffi
+          echo "OPENSSL_DIR=$(brew --prefix openssl)" >> $GITHUB_ENV
+          echo "OPENSSL_INCLUDE_DIR=$(brew --prefix openssl)/include" >> $GITHUB_ENV
+          echo "OPENSSL_LIB_DIR=$(brew --prefix openssl)/lib" >> $GITHUB_ENV
 
       - name: Build
         uses: actions-rs/cargo@v1
@@ -64,6 +64,7 @@ jobs:
           OPENSSL_DIR: ${{ env.OPENSSL_DIR }}
           OPENSSL_INCLUDE_DIR: ${{ env.OPENSSL_INCLUDE_DIR }}
           OPENSSL_LIB_DIR: ${{ env.OPENSSL_LIB_DIR }}
+          RUST_BACKTRACE: 1
 
       - name: Rename artifacts
         shell: bash
