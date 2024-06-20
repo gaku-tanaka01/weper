@@ -30,23 +30,28 @@ pub async fn get_html(url: &str) -> Result<Html, Box<dyn Error>> {
     Ok(html)
 }
 
-pub async fn get_html_with_headless_chrome(url: &str) -> Result<Html, Box<dyn Error>> {
-    let browser = headless_chrome::Browser::new(headless_chrome::LaunchOptions {
-        headless: false, // ヘッドレスモードで実行
-        ..Default::default()
-    })?;
-
-    // 新しいタブを開く
-    let tab = browser.new_tab()?;
-
+pub async fn get_first_page_html_with_headless_chrome(url: &str, 
+tab: &headless_chrome::Tab) -> Result<Html, Box<dyn Error>> {
     // urlにアクセス
     tab.navigate_to(url)?;
     tab.wait_until_navigated()?;
-
     // ページのHTMLを取得
     let raw_html = tab.get_content()?;
     let html = Html::parse_document(&raw_html);
     Ok(html)
+}
+
+pub async fn get_next_page_html_with_headless_chrome(next_page_selector: &str,
+tab: &headless_chrome::Tab) -> Result<Html, Box<dyn Error>> {
+    
+    if let Ok(next_page_button) = tab.wait_for_element(next_page_selector) {
+        next_page_button.click()?;
+        tab.wait_until_navigated()?;
+        let raw_html = tab.get_content()?;
+        let html = Html::parse_document(&raw_html);
+        return Ok(html);
+    } 
+    Err("Next page button not found".into())
 }
 
 // 求人情報を取得するためのパラメータ　base_url以外はdot付きクラス名を入力
@@ -136,6 +141,8 @@ pub async fn get_hp_link(company_name: &str) -> Result<Option<String>, Box<dyn E
 
 #[cfg(test)]
 mod tests {
+    use headless_chrome::LaunchOptions;
+
     use super::*;
 
     #[tokio::test]
@@ -199,5 +206,39 @@ mod tests {
             result.unwrap().unwrap(),
             "https://valleyin.co.jp/".to_string()
         );
+    }
+
+    #[tokio::test]
+    async fn test_get_first_page_html_with_headless_chrome(){
+        let url = "https://www.google.com";
+        let browser = headless_chrome::Browser::new(
+            LaunchOptions {
+                headless: false,
+                ..Default::default()
+            }
+        ).unwrap();
+        let tab = browser.new_tab().unwrap();
+        let html = get_first_page_html_with_headless_chrome(url, &tab).await;
+        assert!(html.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_get_next_page_html_with_headless_chrome(){
+        let url = "https://jp.indeed.com/jobs?q=&start=60&l=%E6%9D%B1%E4%BA%AC%E9%83%BD";
+        let browser = headless_chrome::Browser::new(
+            LaunchOptions {
+                headless: false,
+                port: Some(8000),
+                sandbox: false,
+                ..Default::default()
+            }
+        ).unwrap();
+        let tab = browser.new_tab().unwrap();
+        tab.navigate_to(url).unwrap();
+        tab.wait_until_navigated().unwrap();
+        let next_page_selector = r#"[data-testid="pagination-page-next"]"#;
+
+        let html = get_next_page_html_with_headless_chrome(&next_page_selector, &tab).await;
+        assert!(html.is_ok());
     }
 }

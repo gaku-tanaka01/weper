@@ -8,7 +8,7 @@ async fn main() {
     //コマンドのクライアントを作成して引数を解析する。
     let cli = Cli::parse();
     match &cli.commands {
-        Commands::Run(run_args) => match run_args {
+        Commands::Run(run_args)=> match run_args {
             RunArgs::Green(green_args) => {
                 println!("Greenの求人情報を取得します: {:?}", green_args);
                 match green::run_green_scraper(green_args).await {

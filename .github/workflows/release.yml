@@ -82,7 +82,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./windows-binary/weper_cli.exe
-          asset_name: weper_cli_windows.exe
+          asset_name: weper_cli.exe
           asset_content_type: application/octet-stream
 
       - name: Upload binaries to Release
@@ -92,5 +92,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./linux-binary/weper_cli
-          asset_name: weper_cli_linux
+          asset_name: weper_cli
           asset_content_type: application/octet-stream

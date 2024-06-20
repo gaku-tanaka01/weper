@@ -24,6 +24,7 @@ pub enum RunArgs {
     Indeed(IndeedArgs),
 }
 
+
 // greenのコマンドの引数
 #[derive(clap::Args, Debug)]
 pub struct GreenArgs {
@@ -64,4 +65,6 @@ pub struct IndeedArgs {
     pub area_word: Option<String>,
     #[arg(short, long, help = "取得する求人数の指定")]
     pub count: Option<u32>,
+    #[arg(short, long, help = "インターバルの秒数の指定")]
+    pub interval: Option<u32>,
 }

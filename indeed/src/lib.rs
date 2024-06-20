@@ -4,6 +4,9 @@ use std::error::Error;
 use std::io::BufWriter;
 use std::io::Write;
 use weper_lib;
+use tokio::time;
+use std::time::Duration;
+
 
 const BASE_URL: &str = "https://jp.indeed.com";
 const INDEED_OFFER_PER_PAGE: u32 = 15;
@@ -15,6 +18,7 @@ pub async fn run_indeed_scraper(args: &config::IndeedArgs) -> Result<(), Box<dyn
         area_name = Some("東京都".to_string());
     }
     let count = &args.count.unwrap_or(15) / INDEED_OFFER_PER_PAGE * INDEED_OFFER_PER_PAGE;
+    let interval = args.interval.unwrap_or(5);
     let filename = &format!(
         "indeed_{}_{}_{}件",
         &area_name.as_deref().unwrap_or(""),
@@ -41,11 +45,24 @@ pub async fn run_indeed_scraper(args: &config::IndeedArgs) -> Result<(), Box<dyn
         &area_name.as_deref().unwrap_or("")
     );
 
+    let browser = headless_chrome::Browser::new(
+        headless_chrome::LaunchOptions {
+            headless: false,
+            // port: Some(8000),
+            // sandbox: false, //リリースの時はコメントアウト
+            ..Default::default()
+        }
+    )?;
+    let tab = browser.new_tab()?;
+
     println!("url:{}", url);
     for i in 0..(count / INDEED_OFFER_PER_PAGE) {
-        let url_with_page_num = format!("{}&start={}", url, i * (INDEED_OFFER_PER_PAGE - 5));
+        let html = if i == 0 {
+            weper_lib::get_first_page_html_with_headless_chrome(&url, &tab).await?
+        } else {
+            weper_lib::get_next_page_html_with_headless_chrome(r#"[data-testid="pagination-page-next"]"#, &tab).await?
+        };
 
-        let html = weper_lib::get_html_with_headless_chrome(&url_with_page_num).await?;
         let mut offers_info = weper_lib::get_offer_info(
             &html,
             &weper_lib::GetOfferInfoParams {
@@ -55,9 +72,9 @@ pub async fn run_indeed_scraper(args: &config::IndeedArgs) -> Result<(), Box<dyn
                 job_title_selector: ".jcs-JobTitle",
             },
         )?;
-        // println!("html:{:#?}", html);
+        
+        println!("Page {}: Retrieved {} offers", i + 1, offers_info.len());
 
-        // println!("offers_info:{:#?}", offers_info);
         for offer_info in &mut offers_info {
             let hp_link = match weper_lib::get_hp_link(&offer_info.company_name).await {
                 Ok(hp_link) => hp_link,
@@ -78,14 +95,22 @@ pub async fn run_indeed_scraper(args: &config::IndeedArgs) -> Result<(), Box<dyn
 
         match csv_config::write_to_csv(&mut writer, &offers_info) {
             Ok(_) => {
-                println!(
-                    "{}件のデータ書き込み完了",
-                    { i + 1 } * INDEED_OFFER_PER_PAGE
-                );
+                if i != 1 {
+                println!("{}件のデータ書き込み完了", (i + 1) * INDEED_OFFER_PER_PAGE)
+            }
             }
             Err(e) => {
                 println!("CSV書き込み失敗: {}", e);
                 return Err(Box::new(e));
+            }
+        }
+        // インターバル中にアクションを実行して接続を維持
+        if interval > 0 {
+            for _ in 0..(interval) {
+                if let Err(e) = tab.evaluate("console.log('keep-alive')", false) {
+                    println!("Failed to send keep-alive signal: {}", e);
+                }
+                time::sleep(Duration::from_secs(1)).await;
             }
         }
     }
@@ -102,7 +127,8 @@ mod tests {
         let args = config::IndeedArgs {
             area_word: Some("東京都".to_string()),
             job_word: Some("プログラマー".to_string()),
-            count: Some(30),
+            count: Some(15),
+            interval: Some(5),
         };
 
         let result = run_indeed_scraper(&args).await;

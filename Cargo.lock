@@ -847,6 +847,7 @@ dependencies = [
  "config",
  "csv",
  "csv_config",
+ "headless_chrome",
  "tokio",
  "weper_lib",
 ]
