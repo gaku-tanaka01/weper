@@ -95,9 +95,11 @@ pub async fn run_indeed_scraper(args: &config::IndeedArgs) -> Result<(), Box<dyn
 
         match csv_config::write_to_csv(&mut writer, &offers_info) {
             Ok(_) => {
-                if i != 1 {
-                println!("{}件のデータ書き込み完了", (i + 1) * INDEED_OFFER_PER_PAGE)
-            }
+                if i < 1 {
+                    println!("{}件のデータ書き込み完了", (i + 1) * INDEED_OFFER_PER_PAGE)
+            }else if i > 1 {
+                println!("{}件のデータ書き込み完了", i * INDEED_OFFER_PER_PAGE)
+            } else {}
             }
             Err(e) => {
                 println!("CSV書き込み失敗: {}", e);
