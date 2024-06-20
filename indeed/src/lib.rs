@@ -56,7 +56,7 @@ pub async fn run_indeed_scraper(args: &config::IndeedArgs) -> Result<(), Box<dyn
     let tab = browser.new_tab()?;
 
     println!("url:{}", url);
-    for i in 0..(count / INDEED_OFFER_PER_PAGE) {
+    for i in 0..(count / INDEED_OFFER_PER_PAGE + 1) {
         let html = if i == 0 {
             weper_lib::get_first_page_html_with_headless_chrome(&url, &tab).await?
         } else {
