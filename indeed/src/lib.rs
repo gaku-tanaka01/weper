@@ -29,7 +29,7 @@ async fn get_hp_link_in_indeed(browser: &headless_chrome::Browser, indeed_compan
         tab.set_user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36", Some("ja-JP"), Some("Windows"))?;
         tab.navigate_to(&indeed_company_url)?;
         tab.wait_until_navigated()?;
-        tab.set_default_timeout(std::time::Duration::from_secs(5));
+        tab.set_default_timeout(std::time::Duration::from_secs(1));
         let element = match tab.wait_for_element("a.css-1rezcpd.e19afand0") {
             Ok(element) => element,
             Err(e) => {
