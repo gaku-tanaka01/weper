@@ -123,9 +123,9 @@ pub fn create_unique_file(filename: &str) -> Result<fs::File, Box<dyn Error>> {
                 return Ok(file);
             }
             Err(ref e) if e.kind() == io::ErrorKind::AlreadyExists => {
-                index += 1; // Increment the index and try the next file name
+                index += 1;
             }
-            Err(e) => return Err(Box::new(e) as Box<dyn Error>), // Propagate other kinds of errors
+            Err(e) => return Err(Box::new(e) as Box<dyn Error>),
         }
     }
 }
